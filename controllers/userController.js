@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
 
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 const jwt = require("jwt-then");
 
 exports.register = async (req, res) => {
@@ -35,8 +35,6 @@ exports.login = async (req, res) => {
   const user = await User.findOne({
     email,
   });
-  console.log(email);
-  console.log(password);
   const tyr= bcrypt.compareSync(password,user.password)
   if (!user || ! tyr )throw "Email and Password did not match.";
 

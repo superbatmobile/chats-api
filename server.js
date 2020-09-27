@@ -1,12 +1,22 @@
-
+var express = require("express");
 const mongoose=require('mongoose')
 require('dotenv').config();
 require("./models/User");
-require("./models/Chatroom");
+require("./models/ChatRoom");
 require("./models/Message");
 const app=require('./app');
 const jwt = require("jwt-then");
 const User = mongoose.model("User");
+const router=require("express").Router();
+/*
+const path = require("path");
+
+const CLIENT_BUILD_PATH = path.join(__dirname, "../co-edit/build");
+app.use(express.static(CLIENT_BUILD_PATH));
+app.get("/", function(req, res) {
+  res.sendFile(path.join(CLIENT_BUILD_PATH , "index.html"));
+});
+*/
 
 mongoose
   .connect(process.env.MONGODB_URI,{
@@ -17,9 +27,12 @@ mongoose
     console.log("Database is connected");
   })
   .catch(err => {
+    console.log(process.env.MONGODB_URI);
     console.log("Error is ", err.message);
   });
-
+router.use(function(req, res) {
+    res.sendFile(path.join(__dirname, '../client','build','index.html'));
+});
 
  const server = app.listen(8000 , () => {
   console.log("Server listening on port 8000");
@@ -48,12 +61,11 @@ io.on("connection", (socket) => {
   });
   socket.on("joinRoom", ({ chatroomId }) => {
     socket.join(chatroomId);
-    console.log("A user joined chatroom: " + chatroomId);
+
   });
 
   socket.on("leaveRoom", ({ chatroomId }) => {
     socket.leave(chatroomId);
-    console.log("A user left chatroom: " + chatroomId);
   });
 
   socket.on("chatroomMessage", async ({ chatroomId, message,ID,username }) => {
@@ -66,7 +78,6 @@ io.on("connection", (socket) => {
         username,
       });
       await newMessage.save();
-      console.log(newMessage);
       io.to(chatroomId).emit("newMessage", {
         ID,
         message,
