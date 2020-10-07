@@ -1,3 +1,7 @@
 # chat-api
 
-a node.js build api with socket.io, jwt token features.
+A node.js build api using mongoose as database.
+
+Socket.io is used for real-time communication.
+
+Use jwt for token encryption.
